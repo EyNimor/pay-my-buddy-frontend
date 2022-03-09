@@ -76,6 +76,9 @@ export default {
                     this.alreadyFriend = false;
                 }
             });
+            if(this.friends.length == 0) {
+                this.alreadyFriend = false;
+            }
             if(this.info.email == null) {
                 this.alreadyFriend = true;
                 this.errorMessage = '! Aucun utilisateur trouvé !'

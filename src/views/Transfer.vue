@@ -19,7 +19,7 @@
         </div>
       </div>
       <input v-model="description" id="descriptionInput" type="text" placeholder="Description">
-      <button id="payButton" @click="pay()">Pay</button>
+      <button id="payButton" @click="this.displayConfirmationMessage=true">Pay</button>
     </div>
     <div id="historicLabel">
       <label id="label">My Transactions</label>
@@ -41,9 +41,18 @@
       </table>
     </div>
   </div>
-  <div id="messageBox" v-if="displayMessage">
-    <div id="errorMessage">{{ message }}</div>
-    <button @click="this.displayMessage=false">OK</button>
+  <div id="messageBox" v-if="displayConfirmationMessage">
+    <p>Montant de la transaction :</p>
+    <ul>
+      <li>Montant envoyé à {{ selectedConnection }} : {{ amountToPay }}</li>
+      <li>Monétisation de l'application (à hauteur de 0.5%) : {{ amountToPay / 200 }}</li>
+    </ul>
+    <p>Total : {{ amountToPay + (amountToPay / 200) }}</p>
+    <button @click="pay()">Confirmer</button>
+  </div>
+  <div id="messageBox" v-if="displayErrorMessage">
+    <p id="errorMessage">{{ message }}</p>
+    <button @click="this.displayErrorMessage=false">OK</button>
   </div>
 </template>
 
@@ -76,23 +85,31 @@ export default {
       selectedConnection: '',
       amountToPay: 0.0,
       description: '',
-      displayMessage: false,
+      displayConfirmationMessage: false,
+      displayErrorMessage: false,
       message: ''
     }
   },
   methods: {
     pay() {
+      this.displayConfirmationMessage = false;
       if(this.amountToPay <= 0.0) {
         this.message = '! Veuillez rentrer un somme au-dessus de zéro !';
-        this.displayMessage = true;
+        this.displayErrorMessage = true;
       }
       else {
         axios
           .post('http://localhost:8080/money/transaction', {'giverEmail': this.userEmail, "receiverEmail": this.selectedConnection, 'amount': this.amountToPay, 'description': this.description})
+          .then(response => {
+            if(response.status == 200) {
+              this.message = '! Balance du compte insuffisante !';
+              this.displayErrorMessage = true;
+            }
+          })
           .catch(error => {
             console.log(error);
             this.message = '! Erreur de transaction, veuillez réessayez plus tard :( !';
-            this.displayMessage = true;
+            this.displayErrorMessage = true;
           });
       }
     }
@@ -265,20 +282,18 @@ input[type=number]::-webkit-outer-spin-button {
   justify-content: space-between;
   align-items: center;
   position: absolute;
-  height: 15vh;
   width: 25vw;
   background-color: white;
   top: 37.5vh;
   left: 37.5vw;
   border: 2px black solid;
   border-radius: 5px;
-  padding: 5vh 0 5vh 0;
+  padding: 3vh 0 3vh 0;
   #errorMessage {
     font-weight: bold;
     color: rgb(190, 0, 0);
   }
   button {
-    width: 15%;
     height: 2em;
     border: 0px;
     border-radius: 5px;

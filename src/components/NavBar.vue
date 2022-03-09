@@ -12,7 +12,7 @@
   </nav>
 </div>
 <!--TODO : coder l'emplacement de l'utilisateur sur le site-->
-<div id="pageName">Là, normalement, il y a le nom de la page, mais je l'ai pas codé. ^^'</div>
+<div id="pageName"></div>
 </template>
 
 <script>
