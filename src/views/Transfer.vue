@@ -9,6 +9,7 @@
     </div>
     <div id="sendMoney">
       <select v-model="selectedConnection">
+        <option value="">-Selectionnez un Ami-</option>
         <option v-for="item in friends" :key="item">{{ item }}</option>
       </select>
       <div id="moneyInputGroup">
